@@ -1,0 +1,51 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "insight-ui-webgl"
+version = "0.1.0"
+description = "WebGL + HTML components for 3D data visualization — built on insight-ui patterns."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+authors = [
+    { name = "Alpin Insight Solutions" },
+]
+dependencies = [
+    "django>=5.0",
+    "insight-ui",
+]
+
+# insight-ui is hosted in the alpininsight GitHub org (private/internal),
+# not on PyPI. Use uv sources to point to the git repository.
+[tool.uv.sources]
+insight-ui = { git = "https://github.com/alpininsight/insight-ui", branch = "develop" }
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-django>=4.9",
+    "ruff>=0.9",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["insight_ui_webgl"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "S", "ANN"]
+ignore = ["ANN101", "ANN102", "ANN401", "S308"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+pythonpath = ["."]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-django>=4.12.0",
+]

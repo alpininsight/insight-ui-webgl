@@ -1,0 +1,18 @@
+<div
+  id="{{ tag_id }}-container"
+  class="relative w-full h-full {{ css_class }}"
+>
+  <canvas
+    id="{{ tag_id }}"
+    data-webgl-viewport
+    data-capacity="{{ capacity }}"
+    data-max-entities="{{ max_entities }}"
+    data-camera-mode="{{ camera_mode }}"
+    data-camera-position="{{ camera_position }}"
+    data-camera-target="{{ camera_target }}"
+    data-fov="{{ fov }}"
+    data-bg-color="{{ bg_color }}"
+    data-show-axes="{{ show_axes|yesno:'true,false' }}"
+    class="block w-full h-full"
+  ></canvas>
+</div>
