@@ -23,3 +23,7 @@ htmlcov/
 # AI tools
 .claude/
 CLAUDE.local.md
+
+# Playwright artifacts
+.playwright-cli/
+phase*-demo.png
