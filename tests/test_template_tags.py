@@ -111,3 +111,82 @@ class TestWebGLGridTag:
         )
         assert 'data-color-center="#ffffff"' in html
         assert 'data-color-grid="#cccccc"' in html
+
+
+# ---------------------------------------------------------------------------
+# Phase 2: WebGL Overlay Tags
+# ---------------------------------------------------------------------------
+
+
+class TestWebGLOverlayTextTag:
+    """Test the webgl_overlay_text template tag."""
+
+    def _render(self, tag_string: str) -> str:
+        template = Template(f"{{% load insight_webgl_tags %}}{tag_string}")
+        return template.render(Context())
+
+    def test_default(self) -> None:
+        html = self._render("{% webgl_overlay_text %}")
+        assert 'data-webgl-overlay-text' in html
+        assert 'data-viewport="webgl-viewport"' in html
+        assert 'data-offset-y="8"' in html
+        assert 'data-default-color="#ffcc00"' in html
+        assert 'data-max-width="200"' in html
+
+    def test_custom(self) -> None:
+        html = self._render(
+            '{% webgl_overlay_text tag_id="my-overlay" viewport_id="vp" '
+            'offset_y=12 default_color="#ff0000" max_width=300 %}'
+        )
+        assert 'id="my-overlay"' in html
+        assert 'data-viewport="vp"' in html
+        assert 'data-offset-y="12"' in html
+        assert 'data-default-color="#ff0000"' in html
+        assert 'data-max-width="300"' in html
+
+
+class TestWebGLOverlayLinkTag:
+    """Test the webgl_overlay_link template tag."""
+
+    def _render(self, tag_string: str) -> str:
+        template = Template(f"{{% load insight_webgl_tags %}}{tag_string}")
+        return template.render(Context())
+
+    def test_default(self) -> None:
+        html = self._render("{% webgl_overlay_link %}")
+        assert 'data-webgl-overlay-link' in html
+        assert 'data-viewport="webgl-viewport"' in html
+        assert 'data-default-color="#ffffff"' in html
+
+    def test_color_map(self) -> None:
+        html = self._render(
+            '{% webgl_overlay_link color_map=\'{"credit":"#ff6b6b"}\' %}'
+        )
+        assert '#ff6b6b' in html
+
+
+class TestWebGLThresholdPlaneTag:
+    """Test the webgl_threshold_plane template tag."""
+
+    def _render(self, tag_string: str) -> str:
+        template = Template(f"{{% load insight_webgl_tags %}}{tag_string}")
+        return template.render(Context())
+
+    def test_default(self) -> None:
+        html = self._render("{% webgl_threshold_plane %}")
+        assert 'data-webgl-threshold' in html
+        assert 'data-viewport="webgl-viewport"' in html
+        assert 'data-color="#ff4444"' in html
+        assert 'data-visible="true"' in html
+
+    def test_custom(self) -> None:
+        html = self._render(
+            '{% webgl_threshold_plane height=20.5 color="#00ff00" '
+            'opacity=0.3 width=200 depth=80 visible=False %}'
+        )
+        assert 'data-height="20.5"' in html
+        assert 'data-color="#00ff00"' in html
+        assert 'data-opacity="0.3"' in html
+        assert 'data-width="200"' in html
+        assert 'data-depth="80"' in html
+        assert 'data-visible="false"' in html

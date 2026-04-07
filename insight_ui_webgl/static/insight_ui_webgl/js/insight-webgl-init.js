@@ -13,10 +13,10 @@ import { WebGLViewport } from "./insight-webgl-viewport.js";
 import { WebGLAxis } from "./insight-webgl-axis.js";
 import { WebGLGrid } from "./insight-webgl-grid.js";
 
-// Phase 2: WebGL Overlays — uncomment when implemented
-// import { WebGLOverlayText } from "./insight-webgl-overlay-text.js";
-// import { WebGLOverlayLink } from "./insight-webgl-overlay-link.js";
-// import { WebGLThresholdPlane } from "./insight-webgl-threshold-plane.js";
+// Phase 2: WebGL Overlays
+import { WebGLOverlayText } from "./insight-webgl-overlay-text.js";
+import { WebGLOverlayLink } from "./insight-webgl-overlay-link.js";
+import { WebGLThresholdPlane } from "./insight-webgl-threshold-plane.js";
 
 // Phase 3: Event System — uncomment when implemented
 // import { InsightEventQueue } from "./insight-webgl-event-queue.js";
@@ -45,9 +45,9 @@ Object.assign(window.InsightWebGL, {
     WebGLAxis,
     WebGLGrid,
     // Phase 2
-    // WebGLOverlayText,
-    // WebGLOverlayLink,
-    // WebGLThresholdPlane,
+    WebGLOverlayText,
+    WebGLOverlayLink,
+    WebGLThresholdPlane,
     // Phase 3
     // InsightEventQueue,
     // InsightEventRegistry,
@@ -73,9 +73,9 @@ function initAll() {
     WebGLGrid.initAll();
 
     // Phase 2: WebGL overlays
-    // WebGLOverlayText.initAll();
-    // WebGLOverlayLink.initAll();
-    // WebGLThresholdPlane.initAll();
+    WebGLOverlayText.initAll();
+    WebGLOverlayLink.initAll();
+    WebGLThresholdPlane.initAll();
 
     // Phase 3: Event system (infrastructure)
     // InsightEventQueue.initAll();

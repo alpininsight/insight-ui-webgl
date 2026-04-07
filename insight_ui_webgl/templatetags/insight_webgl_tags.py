@@ -94,3 +94,68 @@ def webgl_grid(
         "plane": plane,
         "visible": visible,
     }
+
+
+# ---------------------------------------------------------------------------
+# WebGL Overlays (Phase 2)
+# ---------------------------------------------------------------------------
+
+
+@register.inclusion_tag("insight_ui_webgl/components/overlay_text.html")
+def webgl_overlay_text(
+    tag_id: str = "webgl-overlay-text",
+    viewport_id: str = "webgl-viewport",
+    offset_y: int = 8,
+    default_color: str = "#ffcc00",
+    bg_color: str = "rgba(0,0,0,0.7)",
+    max_width: int = 200,
+) -> dict[str, Any]:
+    """Render a text overlay manager (sprites + connecting lines)."""
+    return {
+        "tag_id": tag_id,
+        "viewport_id": viewport_id,
+        "offset_y": offset_y,
+        "default_color": default_color,
+        "bg_color": bg_color,
+        "max_width": max_width,
+    }
+
+
+@register.inclusion_tag("insight_ui_webgl/components/overlay_link.html")
+def webgl_overlay_link(
+    tag_id: str = "webgl-overlay-link",
+    viewport_id: str = "webgl-viewport",
+    color_map: str = "",
+    default_color: str = "#ffffff",
+) -> dict[str, Any]:
+    """Render a link overlay manager (lines between two 3D points)."""
+    return {
+        "tag_id": tag_id,
+        "viewport_id": viewport_id,
+        "color_map": color_map,
+        "default_color": default_color,
+    }
+
+
+@register.inclusion_tag("insight_ui_webgl/components/threshold_plane.html")
+def webgl_threshold_plane(
+    tag_id: str = "webgl-threshold",
+    viewport_id: str = "webgl-viewport",
+    height: float = 0.0,
+    color: str = "#ff4444",
+    opacity: float = 0.15,
+    width: int = 100,
+    depth: int = 50,
+    visible: bool = True,
+) -> dict[str, Any]:
+    """Render a horizontal reference plane at a configurable height."""
+    return {
+        "tag_id": tag_id,
+        "viewport_id": viewport_id,
+        "height": height,
+        "color": color,
+        "opacity": opacity,
+        "width": width,
+        "depth": depth,
+        "visible": visible,
+    }

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>insight-ui-webgl — Phase 1 Demo</title>
+  <title>insight-ui-webgl — Phase 1+2 Demo</title>
 
   <!-- Three.js vendored locally (cdnjs has no addons; OrbitControls from upstream r180) -->
   <script type="importmap">
@@ -47,23 +47,35 @@
 </head>
 <body>
   <header>
-    <h1>insight-ui-webgl — Phase 1 Demo <span class="status">PHASE 1 COMPLETE</span></h1>
-    <div class="subtitle">WebGL atoms: viewport + axis + grid (Three.js via Cloudflare CDN)</div>
+    <h1>insight-ui-webgl — Phase 1+2 Demo <span class="status">PHASE 2 COMPLETE</span></h1>
+    <div class="subtitle">WebGL atoms: viewport, axis, grid, overlay_text, overlay_link, threshold_plane</div>
   </header>
 
   <main>
     <div class="viewport-wrapper">
-      {% webgl_viewport tag_id="demo-viewport" camera_position="80,60,80" camera_target="50,0,25" fov=55 bg_color="#0a0a14" %}
+      {% webgl_viewport tag_id="demo-viewport" camera_position="80,60,80" camera_target="50,15,25" fov=55 bg_color="#0a0a14" %}
       {% webgl_grid tag_id="demo-grid" viewport_id="demo-viewport" size=100 divisions=20 color_center="#3b82f6" color_grid="#1a1a2e" plane="xz" %}
       {% webgl_axis tag_id="demo-axis" viewport_id="demo-viewport" x_label="Time" y_label="Price" z_label="Entity" x_length=100 y_length=60 z_length=50 %}
+
+      {# Phase 2 — Overlays #}
+      {% webgl_overlay_text tag_id="demo-text" viewport_id="demo-viewport" %}
+      {% webgl_overlay_link tag_id="demo-links" viewport_id="demo-viewport" color_map='{"credit":"#ff6b6b","market":"#4ecdc4","liquidity":"#ffe66d"}' %}
+      {% webgl_threshold_plane tag_id="demo-threshold" viewport_id="demo-viewport" height=25 color="#ff4444" opacity=0.18 width=100 depth=50 %}
     </div>
 
     <aside>
-      <h2>Components Rendered</h2>
+      <h2>Phase 1 — Foundation</h2>
       <ul>
-        <li><code>webgl_viewport</code> — Three.js scene with OrbitControls</li>
-        <li><code>webgl_grid</code> — XZ reference plane (20 divisions)</li>
-        <li><code>webgl_axis</code> — Labeled X/Y/Z axes with sprites</li>
+        <li><code>webgl_viewport</code> — Three.js scene</li>
+        <li><code>webgl_grid</code> — XZ reference plane</li>
+        <li><code>webgl_axis</code> — Labeled X/Y/Z axes</li>
+      </ul>
+
+      <h2>Phase 2 — Overlays</h2>
+      <ul>
+        <li><code>webgl_overlay_text</code> — Text annotations</li>
+        <li><code>webgl_overlay_link</code> — Lines between points</li>
+        <li><code>webgl_threshold_plane</code> — Horizontal alert plane</li>
       </ul>
 
       <h2>Try It</h2>
@@ -99,5 +111,31 @@
       </ul>
     </aside>
   </main>
+
+  <script type="module">
+    // Phase 2 demo: populate overlays with sample data after init.
+    // In a real app these would be driven by SSE/WS events via the
+    // event_queue/event_registry components (Phase 3).
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        const txt = window.InsightWebGL.WebGLOverlayText.instances.get(
+          document.getElementById("demo-text"));
+        const lnk = window.InsightWebGL.WebGLOverlayLink.instances.get(
+          document.getElementById("demo-links"));
+        if (!txt || !lnk) return;
+
+        // Three sample annotations along the X axis at different lanes
+        txt.create("a1", "Earnings Beat", [20, 18, 10], { color: "#ffcc00" });
+        txt.create("a2", "Downgrade", [50, 12, 25], { color: "#ff4444" });
+        txt.create("a3", "Buy Signal", [80, 22, 40], { color: "#10b981" });
+
+        // Two sample links between annotation anchors
+        lnk.create("l1", [20, 18, 10], [50, 12, 25], "credit", 0.7);
+        lnk.create("l2", [50, 12, 25], [80, 22, 40], "market", 0.5);
+
+        debugLog("Phase 2 demo content seeded.");
+      }, 100);
+    });
+  </script>
 </body>
 </html>
