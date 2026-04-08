@@ -24,10 +24,12 @@ export class WebGLOverlayText {
         this._viewport = null;
         this._items = new Map();  // id -> { sprite, line }
 
+        // Color defaults resolve via insight-ui tokens — see issue #129.
         this.config = {
             viewportId: element.dataset.viewport ?? "webgl-viewport",
             offsetY: parseFloat(element.dataset.offsetY ?? "8"),
-            defaultColor: element.dataset.defaultColor ?? "#ffcc00",
+            defaultColor: InsightWebGLUtils.resolveColor(
+                element.dataset.defaultColor, "--color-insight-webgl-annotation", "#ffcc00"),
             bgColor: element.dataset.bgColor ?? "rgba(0,0,0,0.7)",
             maxWidth: parseInt(element.dataset.maxWidth ?? "200", 10),
         };

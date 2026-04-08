@@ -25,10 +25,16 @@ export class WebGLThresholdPlane {
         this._border = null;
         this._viewport = null;
 
+        // Threshold color defaults to insight-ui's danger token (semantic:
+        // thresholds usually mark alert levels). See issue #129.
         this.config = {
             viewportId: element.dataset.viewport ?? "webgl-viewport",
             height: parseFloat(element.dataset.height ?? "0"),
-            color: element.dataset.color ?? "#ff4444",
+            color: InsightWebGLUtils.resolveColor(
+                element.dataset.color,
+                "--color-insight-webgl-threshold",
+                InsightWebGLUtils.getCssVar("--color-insight-danger", "#ef4444"),
+            ),
             opacity: parseFloat(element.dataset.opacity ?? "0.15"),
             width: parseInt(element.dataset.width ?? "100", 10),
             depth: parseInt(element.dataset.depth ?? "50", 10),

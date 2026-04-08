@@ -1,4 +1,16 @@
-"""Template tags for insight-ui-webgl components."""
+"""Template tags for insight-ui-webgl components.
+
+Design-token policy
+-------------------
+Color parameters default to the empty string. A non-empty value is an
+**explicit override** and passed through to the HTML ``data-*`` attribute.
+An empty value signals "use the insight-ui design token" — the JS class
+reads the appropriate CSS custom property (e.g. ``--color-insight-webgl-axis-x``)
+with a last-resort hardcoded fallback.
+
+This keeps insight-ui-webgl themable by the host app without every tag
+repeating hex codes. See insight-ui issue #129 for the upstream token proposal.
+"""
 
 from __future__ import annotations
 
@@ -23,7 +35,7 @@ def webgl_viewport(
     camera_position: str = "50,30,50",
     camera_target: str = "50,30,0",
     fov: int = 60,
-    bg_color: str = "#1a1a2e",
+    bg_color: str = "",
     show_axes: bool = True,
     css_class: str = "",
 ) -> dict[str, Any]:
@@ -49,9 +61,9 @@ def webgl_axis(
     x_label: str = "X",
     y_label: str = "Y",
     z_label: str = "Z",
-    x_color: str = "#ff4444",
-    y_color: str = "#44ff44",
-    z_color: str = "#4444ff",
+    x_color: str = "",
+    y_color: str = "",
+    z_color: str = "",
     x_length: int = 100,
     y_length: int = 60,
     z_length: int = 50,
@@ -78,8 +90,8 @@ def webgl_grid(
     viewport_id: str = "webgl-viewport",
     size: int = 100,
     divisions: int = 10,
-    color_center: str = "#444444",
-    color_grid: str = "#222222",
+    color_center: str = "",
+    color_grid: str = "",
     plane: str = "xz",
     visible: bool = True,
 ) -> dict[str, Any]:
@@ -106,7 +118,7 @@ def webgl_overlay_text(
     tag_id: str = "webgl-overlay-text",
     viewport_id: str = "webgl-viewport",
     offset_y: int = 8,
-    default_color: str = "#ffcc00",
+    default_color: str = "",
     bg_color: str = "rgba(0,0,0,0.7)",
     max_width: int = 200,
 ) -> dict[str, Any]:
@@ -126,7 +138,7 @@ def webgl_overlay_link(
     tag_id: str = "webgl-overlay-link",
     viewport_id: str = "webgl-viewport",
     color_map: str = "",
-    default_color: str = "#ffffff",
+    default_color: str = "",
 ) -> dict[str, Any]:
     """Render a link overlay manager (lines between two 3D points)."""
     return {
@@ -142,7 +154,7 @@ def webgl_threshold_plane(
     tag_id: str = "webgl-threshold",
     viewport_id: str = "webgl-viewport",
     height: float = 0.0,
-    color: str = "#ff4444",
+    color: str = "",
     opacity: float = 0.15,
     width: int = 100,
     depth: int = 50,

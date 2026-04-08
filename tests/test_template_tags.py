@@ -18,6 +18,8 @@ class TestWebGLViewportTag:
         assert 'id="webgl-viewport"' in html
         assert 'data-capacity="500"' in html
         assert 'data-camera-mode="perspective"' in html
+        # Default bg_color is empty — JS resolves via CSS var
+        assert 'data-bg-color=""' in html
 
     def test_custom_viewport(self) -> None:
         html = self._render(
@@ -36,7 +38,7 @@ class TestWebGLViewportTag:
         html = self._render('{% webgl_viewport css_class="h-96" %}')
         assert 'h-96' in html
 
-    def test_bg_color(self) -> None:
+    def test_bg_color_explicit(self) -> None:
         html = self._render('{% webgl_viewport bg_color="#000000" %}')
         assert 'data-bg-color="#000000"' in html
 
@@ -70,6 +72,13 @@ class TestWebGLAxisTag:
     def test_custom_viewport_binding(self) -> None:
         html = self._render('{% webgl_axis viewport_id="chart-viewport" %}')
         assert 'data-viewport="chart-viewport"' in html
+
+    def test_default_colors_empty(self) -> None:
+        """Default axis colors are empty — JS resolves via insight-ui CSS vars."""
+        html = self._render("{% webgl_axis %}")
+        assert 'data-x-color=""' in html
+        assert 'data-y-color=""' in html
+        assert 'data-z-color=""' in html
 
     def test_custom_colors(self) -> None:
         html = self._render('{% webgl_axis x_color="#ff0000" %}')
@@ -130,7 +139,8 @@ class TestWebGLOverlayTextTag:
         assert 'data-webgl-overlay-text' in html
         assert 'data-viewport="webgl-viewport"' in html
         assert 'data-offset-y="8"' in html
-        assert 'data-default-color="#ffcc00"' in html
+        # Default color is empty — JS resolves via insight-ui CSS var
+        assert 'data-default-color=""' in html
         assert 'data-max-width="200"' in html
 
     def test_custom(self) -> None:
@@ -156,7 +166,7 @@ class TestWebGLOverlayLinkTag:
         html = self._render("{% webgl_overlay_link %}")
         assert 'data-webgl-overlay-link' in html
         assert 'data-viewport="webgl-viewport"' in html
-        assert 'data-default-color="#ffffff"' in html
+        assert 'data-default-color=""' in html
 
     def test_color_map(self) -> None:
         html = self._render(
@@ -176,7 +186,8 @@ class TestWebGLThresholdPlaneTag:
         html = self._render("{% webgl_threshold_plane %}")
         assert 'data-webgl-threshold' in html
         assert 'data-viewport="webgl-viewport"' in html
-        assert 'data-color="#ff4444"' in html
+        # Default color is empty — JS resolves via insight-ui CSS var
+        assert 'data-color=""' in html
         assert 'data-visible="true"' in html
 
     def test_custom(self) -> None:

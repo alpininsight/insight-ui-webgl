@@ -23,15 +23,19 @@ export class WebGLAxis {
         this._group = null;
         this._viewport = null;
 
-        // Read config from data attributes
+        // Read config from data attributes.
+        // Axis colors resolve via insight-ui tokens — see issue #129.
         this.config = {
             viewportId: element.dataset.viewport ?? "webgl-viewport",
             xLabel: element.dataset.xLabel ?? "X",
             yLabel: element.dataset.yLabel ?? "Y",
             zLabel: element.dataset.zLabel ?? "Z",
-            xColor: element.dataset.xColor ?? "#ff4444",
-            yColor: element.dataset.yColor ?? "#44ff44",
-            zColor: element.dataset.zColor ?? "#4444ff",
+            xColor: InsightWebGLUtils.resolveColor(
+                element.dataset.xColor, "--color-insight-webgl-axis-x", "#ff6b6b"),
+            yColor: InsightWebGLUtils.resolveColor(
+                element.dataset.yColor, "--color-insight-webgl-axis-y", "#6bcf7f"),
+            zColor: InsightWebGLUtils.resolveColor(
+                element.dataset.zColor, "--color-insight-webgl-axis-z", "#4fa3ff"),
             xLength: parseInt(element.dataset.xLength ?? "100", 10),
             yLength: parseInt(element.dataset.yLength ?? "60", 10),
             zLength: parseInt(element.dataset.zLength ?? "50", 10),

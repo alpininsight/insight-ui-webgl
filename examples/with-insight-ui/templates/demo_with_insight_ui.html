@@ -1,0 +1,76 @@
+{% extends "insight_ui/base.html" %}
+{% load static insight_webgl_tags %}
+
+{#
+  Demonstrates insight-ui-webgl integrated with insight-ui's base template.
+  All layout, colors, typography inherit from insight-ui. Only WebGL-specific
+  blocks are added (importmap, viewport, overlays, demo seeding).
+
+  This is "Option 2" from the insight-ui-user integration guide, adapted
+  for sibling-library-with-WebGL.
+#}
+
+{% block title %}insight-ui-webgl · Phase 2 Demo{% endblock %}
+
+{% block extra_head %}
+  {# Three.js via importmap — vendored in insight_ui_webgl/static/vendor/ #}
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "{% static 'insight_ui_webgl/vendor/three/three.module.min.js' %}",
+      "three/addons/": "{% static 'insight_ui_webgl/vendor/three/addons/' %}"
+    }
+  }
+  </script>
+  <script>window.JS_DEBUG = true;</script>
+  <script src="{% static 'insight_ui_webgl/js/insight-webgl-utils.js' %}"></script>
+  <script type="module" src="{% static 'insight_ui_webgl/js/insight-webgl-init.js' %}"></script>
+{% endblock %}
+
+{% block heading %}
+  <h1>insight-ui-webgl</h1>
+  <p>WebGL components themed via insight-ui design tokens</p>
+{% endblock %}
+
+{% block content %}
+  <section class="component-container">
+    <h2>Live Viewport</h2>
+    <p class="text-secondary">
+      All colors below come from insight-ui CSS variables
+      (<code class="inline-tag">--color-insight-webgl-*</code>) with
+      hardcoded fallbacks. When insight-ui ships the tokens from
+      <a class="text-link" href="https://github.com/alpininsight/insight-ui/issues/129">issue #129</a>,
+      the fallbacks become dead code.
+    </p>
+
+    <div style="position: relative; height: 500px; margin-top: 1rem; border-radius: 0.25rem; overflow: hidden;">
+      {% webgl_viewport tag_id="ui-viewport" camera_position="80,60,80" camera_target="50,15,25" fov=55 %}
+      {% webgl_grid tag_id="ui-grid" viewport_id="ui-viewport" size=100 divisions=20 plane="xz" %}
+      {% webgl_axis tag_id="ui-axis" viewport_id="ui-viewport" x_label="Time" y_label="Price" z_label="Entity" %}
+      {% webgl_overlay_text tag_id="ui-text" viewport_id="ui-viewport" %}
+      {% webgl_overlay_link tag_id="ui-links" viewport_id="ui-viewport" color_map='{"credit":"#ff6b6b","market":"#4ecdc4"}' %}
+      {% webgl_threshold_plane tag_id="ui-threshold" viewport_id="ui-viewport" height=25 opacity=0.18 %}
+    </div>
+  </section>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script type="module">
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        const txt = window.InsightWebGL?.WebGLOverlayText?.instances.get(
+          document.getElementById("ui-text"));
+        const lnk = window.InsightWebGL?.WebGLOverlayLink?.instances.get(
+          document.getElementById("ui-links"));
+        if (!txt || !lnk) return;
+
+        txt.create("a1", "Earnings Beat", [20, 18, 10]);
+        txt.create("a2", "Downgrade", [50, 12, 25], { color: "#ff4444" });
+        txt.create("a3", "Buy Signal", [80, 22, 40], { color: "#10b981" });
+
+        lnk.create("l1", [20, 18, 10], [50, 12, 25], "credit", 0.7);
+        lnk.create("l2", [50, 12, 25], [80, 22, 40], "market", 0.5);
+      }, 100);
+    });
+  </script>
+{% endblock %}

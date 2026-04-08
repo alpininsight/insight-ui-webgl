@@ -8,6 +8,44 @@ A Django component library that brings the insight-ui architecture (template tag
 
 **insight-ui-webgl is not a fork of insight-ui** — it's a sibling library that follows the same patterns and uses insight-ui as a foundation for design tokens, dark mode, and base layout.
 
+## Discipline: Don't Reinvent, Consume insight-ui
+
+We hold ourselves to the same discipline as `insight-ui-user`: **anything that is
+generic enough to belong in insight-ui gets filed as an upstream issue and used
+with a local fallback until adopted**.
+
+### What lives here
+- 3D viewport, axes, grid, overlays, streaming charts — **WebGL specific**
+- Three.js wrapping, ring buffers, sliding windows — **WebGL specific**
+- Event queue / transports for SSE and WebSocket — **data flow specific**
+
+### What goes upstream to insight-ui
+Anything we'd otherwise reinvent: layout helpers, design tokens, base template,
+HTML panel components (feeds, legends, status indicators, playback controls).
+
+### Active upstream issues
+- [insight-ui#129](https://github.com/alpininsight/insight-ui/issues/129) —
+  WebGL/3D design tokens (axis, grid, canvas, threshold, overlay colors)
+- [insight-ui#130](https://github.com/alpininsight/insight-ui/issues/130) —
+  document the `with-<sibling>` example pattern
+
+Until these are adopted, `insight-ui-webgl` ships local fallback values via the
+`var(--color-insight-webgl-*, #hardcoded)` pattern. The moment insight-ui
+defines the variables, our fallbacks become dead code — no migration needed.
+
+### Design token resolution (3-tier)
+Every color in insight-ui-webgl goes through this policy:
+1. **Explicit** — `data-*` attribute set by the template tag user
+2. **insight-ui CSS variable** — resolved via `getComputedStyle`
+3. **Hardcoded fallback** — last resort, baked into the JS class
+
+See `insight-webgl-utils.js` for `InsightWebGLUtils.resolveColor()`.
+
+### Integration pattern
+For the full integration with `{% extends "insight_ui/base.html" %}`, see
+[`examples/with-insight-ui/`](examples/with-insight-ui/). This mirrors the
+`insight-ui-user/examples/with-insight-ui/` reference (insight-ui-user PR #21).
+
 ## Use Cases
 
 The library is designed for interactive data visualization applications:

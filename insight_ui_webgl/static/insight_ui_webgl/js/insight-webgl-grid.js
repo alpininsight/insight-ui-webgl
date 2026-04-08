@@ -22,13 +22,16 @@ export class WebGLGrid {
         this._gridHelper = null;
         this._viewport = null;
 
-        // Read config from data attributes
+        // Read config from data attributes.
+        // Grid colors resolve via insight-ui tokens — see issue #129.
         this.config = {
             viewportId: element.dataset.viewport ?? "webgl-viewport",
             size: parseInt(element.dataset.size ?? "100", 10),
             divisions: parseInt(element.dataset.divisions ?? "10", 10),
-            colorCenter: element.dataset.colorCenter ?? "#444444",
-            colorGrid: element.dataset.colorGrid ?? "#222222",
+            colorCenter: InsightWebGLUtils.resolveColor(
+                element.dataset.colorCenter, "--color-insight-webgl-grid-center", "#444466"),
+            colorGrid: InsightWebGLUtils.resolveColor(
+                element.dataset.colorGrid, "--color-insight-webgl-grid-line", "#22223a"),
             plane: element.dataset.plane ?? "xz",
             visible: element.dataset.visible !== "false",
         };

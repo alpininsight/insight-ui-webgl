@@ -36,10 +36,12 @@ export class WebGLOverlayLink {
             }
         }
 
+        // Color defaults resolve via insight-ui tokens — see issue #129.
         this.config = {
             viewportId: element.dataset.viewport ?? "webgl-viewport",
             colorMap,
-            defaultColor: element.dataset.defaultColor ?? "#ffffff",
+            defaultColor: InsightWebGLUtils.resolveColor(
+                element.dataset.defaultColor, "--color-insight-webgl-link", "#ffffff"),
         };
 
         this.bindEvents();

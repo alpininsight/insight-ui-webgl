@@ -22,7 +22,12 @@ export class WebGLViewport {
         this.element = element;
         this.boundHandlers = [];
 
-        // Read config from data attributes
+        // Read config from data attributes.
+        // Colors follow the 3-tier resolution policy:
+        //   1. data-* attribute (explicit user override)
+        //   2. insight-ui CSS variable
+        //   3. hardcoded fallback (last resort)
+        // See insight-ui issue #129 for WebGL design tokens.
         this.config = {
             capacity: parseInt(element.dataset.capacity ?? "500", 10),
             maxEntities: parseInt(element.dataset.maxEntities ?? "20", 10),
@@ -32,7 +37,11 @@ export class WebGLViewport {
             cameraTarget: (element.dataset.cameraTarget ?? "50,30,0")
                 .split(",").map(Number),
             fov: parseInt(element.dataset.fov ?? "60", 10),
-            bgColor: element.dataset.bgColor ?? "#1a1a2e",
+            bgColor: InsightWebGLUtils.resolveColor(
+                element.dataset.bgColor,
+                "--color-insight-webgl-bg",
+                "#1a1a2e",
+            ),
             showAxes: element.dataset.showAxes === "true",
         };
 

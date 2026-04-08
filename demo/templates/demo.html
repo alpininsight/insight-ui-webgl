@@ -1,12 +1,26 @@
 {% load static insight_webgl_tags %}
+{#
+  Minimal standalone demo for insight-ui-webgl.
+
+  This template uses the insight-ui design-token system (CSS custom
+  properties with hardcoded fallbacks). It does NOT extend
+  insight_ui/base.html — for the full integration pattern see
+  examples/with-insight-ui/ where base.html is extended properly.
+
+  Color policy (same as insight-ui-user PR #21):
+    background-color: var(--color-insight-primary, #3b82f6);
+
+  When insight-ui ships the WebGL tokens from issue #129, the fallback
+  values below become dead code — the variables alone will resolve.
+#}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>insight-ui-webgl — Phase 1+2 Demo</title>
+  <title>insight-ui-webgl — Standalone Demo</title>
 
-  <!-- Three.js vendored locally (cdnjs has no addons; OrbitControls from upstream r180) -->
+  {# Three.js vendored locally (cdnjs has no addons; OrbitControls from upstream r180) #}
   <script type="importmap">
   {
     "imports": {
@@ -16,29 +30,110 @@
   }
   </script>
 
-  <!-- HTMX (Cloudflare CDN) for lifecycle hooks -->
+  {# HTMX from Cloudflare CDN for lifecycle hooks #}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.4/htmx.min.js"></script>
 
   <style>
+    /*
+     * Local fallback tokens — match insight-ui upstream names. When
+     * insight-ui ships these variables (issue #129), remove this block
+     * and the host theme takes over automatically.
+     */
+    :root {
+      --color-insight-primary: #3b82f6;
+      --color-insight-text-primary: #1a1a1a;
+      --color-insight-text-secondary: #6b7280;
+      --color-insight-success: #10b981;
+      --color-insight-webgl-bg: #0a0a14;
+      --color-insight-webgl-axis-x: #ff6b6b;
+      --color-insight-webgl-axis-y: #6bcf7f;
+      --color-insight-webgl-axis-z: #4fa3ff;
+      --color-insight-webgl-grid-center: #3b82f6;
+      --color-insight-webgl-grid-line: #1a1a2e;
+    }
+    [data-theme="dark"] {
+      --color-insight-text-primary: #e0e0e0;
+      --color-insight-text-secondary: #9ca3af;
+      --surface-1: #0a0a14;
+      --surface-2: #1a1a2e;
+      --surface-border: #2a2a3e;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0a0a14; color: #e0e0e0; }
+    html, body {
+      height: 100%;
+      font-family: "insight-ui", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--surface-1);
+      color: var(--color-insight-text-primary);
+    }
     body { display: flex; flex-direction: column; }
-    header { padding: 16px 24px; background: #1a1a2e; border-bottom: 1px solid #2a2a3e; }
-    h1 { font-size: 18px; margin-bottom: 4px; color: #ffffff; }
-    .subtitle { font-size: 13px; color: #888; }
-    .status { display: inline-block; margin-left: 12px; padding: 2px 8px; background: #10b981; color: #000; border-radius: 3px; font-size: 11px; font-weight: 600; }
-    main { flex: 1; display: grid; grid-template-columns: 1fr 280px; grid-template-rows: 1fr; gap: 12px; padding: 12px; min-height: 0; overflow: hidden; }
-    .viewport-wrapper { position: relative; background: #1a1a2e; border-radius: 6px; overflow: hidden; min-height: 0; }
+
+    header {
+      padding: 16px 24px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--surface-border);
+    }
+    h1 { font-size: 18px; margin-bottom: 4px; font-weight: 600; }
+    .subtitle { font-size: 13px; color: var(--color-insight-text-secondary); }
+    .badge-status {
+      display: inline-block;
+      margin-left: 12px;
+      padding: 2px 8px;
+      background: var(--color-insight-success);
+      color: #000;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      grid-template-rows: 1fr;
+      gap: 12px;
+      padding: 12px;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .viewport-wrapper {
+      position: relative;
+      background: var(--surface-2);
+      border-radius: 6px;
+      overflow: hidden;
+      min-height: 0;
+    }
     #demo-viewport-container { position: absolute; inset: 0; }
-    aside { background: #1a1a2e; border-radius: 6px; padding: 16px; font-size: 13px; line-height: 1.6; }
-    aside h2 { font-size: 14px; color: #fff; margin-bottom: 8px; }
+
+    aside {
+      background: var(--surface-2);
+      border-radius: 6px;
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-y: auto;
+    }
+    aside h2 { font-size: 14px; margin-bottom: 8px; font-weight: 600; }
     aside ul { list-style: none; margin-bottom: 16px; }
-    aside li { padding: 4px 0; color: #aaa; }
-    aside li::before { content: "▸ "; color: #3b82f6; }
-    aside code { background: #0a0a14; padding: 1px 5px; border-radius: 2px; font-size: 11px; color: #60a5fa; }
-    .legend { margin-top: 12px; }
-    .legend-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+    aside li { padding: 4px 0; color: var(--color-insight-text-secondary); }
+    aside li::before { content: "▸ "; color: var(--color-insight-primary); }
+    aside code {
+      background: var(--surface-1);
+      padding: 1px 5px;
+      border-radius: 2px;
+      font-size: 11px;
+      color: var(--color-insight-primary);
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+    }
     .legend-dot { width: 12px; height: 2px; }
+    .axis-x { background: var(--color-insight-webgl-axis-x); }
+    .axis-y { background: var(--color-insight-webgl-axis-y); }
+    .axis-z { background: var(--color-insight-webgl-axis-z); }
   </style>
 
   <script>window.JS_DEBUG = true;</script>
@@ -47,67 +142,53 @@
 </head>
 <body>
   <header>
-    <h1>insight-ui-webgl — Phase 1+2 Demo <span class="status">PHASE 2 COMPLETE</span></h1>
-    <div class="subtitle">WebGL atoms: viewport, axis, grid, overlay_text, overlay_link, threshold_plane</div>
+    <h1>insight-ui-webgl — Standalone Demo <span class="badge-status">PHASE 2 COMPLETE</span></h1>
+    <div class="subtitle">Design tokens via <code>var(--color-insight-*)</code> — see insight-ui issue #129</div>
   </header>
 
   <main>
     <div class="viewport-wrapper">
-      {% webgl_viewport tag_id="demo-viewport" camera_position="80,60,80" camera_target="50,15,25" fov=55 bg_color="#0a0a14" %}
-      {% webgl_grid tag_id="demo-grid" viewport_id="demo-viewport" size=100 divisions=20 color_center="#3b82f6" color_grid="#1a1a2e" plane="xz" %}
+      {% webgl_viewport tag_id="demo-viewport" camera_position="80,60,80" camera_target="50,15,25" fov=55 %}
+      {% webgl_grid tag_id="demo-grid" viewport_id="demo-viewport" size=100 divisions=20 plane="xz" %}
       {% webgl_axis tag_id="demo-axis" viewport_id="demo-viewport" x_label="Time" y_label="Price" z_label="Entity" x_length=100 y_length=60 z_length=50 %}
-
-      {# Phase 2 — Overlays #}
       {% webgl_overlay_text tag_id="demo-text" viewport_id="demo-viewport" %}
       {% webgl_overlay_link tag_id="demo-links" viewport_id="demo-viewport" color_map='{"credit":"#ff6b6b","market":"#4ecdc4","liquidity":"#ffe66d"}' %}
-      {% webgl_threshold_plane tag_id="demo-threshold" viewport_id="demo-viewport" height=25 color="#ff4444" opacity=0.18 width=100 depth=50 %}
+      {% webgl_threshold_plane tag_id="demo-threshold" viewport_id="demo-viewport" height=25 opacity=0.18 width=100 depth=50 %}
     </div>
 
     <aside>
       <h2>Phase 1 — Foundation</h2>
       <ul>
-        <li><code>webgl_viewport</code> — Three.js scene</li>
-        <li><code>webgl_grid</code> — XZ reference plane</li>
-        <li><code>webgl_axis</code> — Labeled X/Y/Z axes</li>
+        <li><code>webgl_viewport</code></li>
+        <li><code>webgl_grid</code></li>
+        <li><code>webgl_axis</code></li>
       </ul>
 
       <h2>Phase 2 — Overlays</h2>
       <ul>
-        <li><code>webgl_overlay_text</code> — Text annotations</li>
-        <li><code>webgl_overlay_link</code> — Lines between points</li>
-        <li><code>webgl_threshold_plane</code> — Horizontal alert plane</li>
+        <li><code>webgl_overlay_text</code></li>
+        <li><code>webgl_overlay_link</code></li>
+        <li><code>webgl_threshold_plane</code></li>
       </ul>
 
       <h2>Try It</h2>
       <ul>
         <li><strong>Drag</strong> — orbit the camera</li>
-        <li><strong>Scroll</strong> — zoom in/out</li>
+        <li><strong>Scroll</strong> — zoom</li>
         <li><strong>Right-drag</strong> — pan</li>
       </ul>
 
       <h2>Axis Legend</h2>
-      <div class="legend">
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#ff4444"></div>
-          <span>X — Time</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#44ff44"></div>
-          <span>Y — Price</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#4444ff"></div>
-          <span>Z — Entity</span>
-        </div>
-      </div>
+      <div class="legend-item"><div class="legend-dot axis-x"></div><span>X — Time</span></div>
+      <div class="legend-item"><div class="legend-dot axis-y"></div><span>Y — Price</span></div>
+      <div class="legend-item"><div class="legend-dot axis-z"></div><span>Z — Entity</span></div>
 
-      <h2>Architecture</h2>
+      <h2>Design Tokens</h2>
       <ul>
-        <li>4-part pattern: tag, HTML, JS, init</li>
-        <li>WeakMap singleton guard</li>
-        <li><code>__insightInstance</code> for cleanup</li>
-        <li>Phantom div pattern for atoms</li>
-        <li>Custom DOM events for comms</li>
+        <li>All colors via insight-ui CSS vars</li>
+        <li>Host app can override via <code>:root</code></li>
+        <li>See <code>examples/with-insight-ui/</code></li>
+        <li>Upstream: insight-ui#129</li>
       </ul>
     </aside>
   </main>
@@ -124,12 +205,10 @@
           document.getElementById("demo-links"));
         if (!txt || !lnk) return;
 
-        // Three sample annotations along the X axis at different lanes
-        txt.create("a1", "Earnings Beat", [20, 18, 10], { color: "#ffcc00" });
+        txt.create("a1", "Earnings Beat", [20, 18, 10]);
         txt.create("a2", "Downgrade", [50, 12, 25], { color: "#ff4444" });
         txt.create("a3", "Buy Signal", [80, 22, 40], { color: "#10b981" });
 
-        // Two sample links between annotation anchors
         lnk.create("l1", [20, 18, 10], [50, 12, 25], "credit", 0.7);
         lnk.create("l2", [50, 12, 25], [80, 22, 40], "market", 0.5);
 

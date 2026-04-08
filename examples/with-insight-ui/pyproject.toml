@@ -1,0 +1,15 @@
+[project]
+name = "insight-ui-webgl-example-with-insight-ui"
+version = "0.1.0"
+description = "Example: insight-ui-webgl integrated with insight-ui base template."
+requires-python = ">=3.12"
+dependencies = [
+    "django>=6.0",
+    "insight-ui",
+    "insight-ui-webgl",
+    "whitenoise",
+]
+
+[tool.uv.sources]
+insight-ui = { git = "https://github.com/alpininsight/insight-ui", branch = "develop" }
+insight-ui-webgl = { path = "../..", editable = true }
