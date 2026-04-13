@@ -26,6 +26,9 @@ CLAUDE.local.md
 
 # Playwright artifacts
 .playwright-cli/
-phase*-demo.png
-demo-8765.png
-phase2-refactored.png
+*.png
+
+# Example local state
+examples/*/.venv/
+examples/*/db.sqlite3
+examples/*/staticfiles/

@@ -41,10 +41,12 @@ Every color in insight-ui-webgl goes through this policy:
 
 See `insight-webgl-utils.js` for `InsightWebGLUtils.resolveColor()`.
 
-### Integration pattern
-For the full integration with `{% extends "insight_ui/base.html" %}`, see
-[`examples/with-insight-ui/`](examples/with-insight-ui/). This mirrors the
-`insight-ui-user/examples/with-insight-ui/` reference (insight-ui-user PR #21).
+### Examples
+
+| Example | Description | Run |
+|---------|-------------|-----|
+| [`examples/standalone/`](examples/standalone/) | Minimal demo without insight-ui base template. Own CSS with design token fallbacks. | `cd examples/standalone && uv sync && DJANGO_SETTINGS_MODULE=settings uv run python manage.py runserver 8765` |
+| [`examples/with-insight-ui/`](examples/with-insight-ui/) | Full integration: extends `insight_ui/base.html`, uses navbar, footer, dark mode. Mirrors the `insight-ui-user` pattern (PR #21). | `cd examples/with-insight-ui && uv sync && uv run python manage.py runserver 8766` |
 
 ## Use Cases
 

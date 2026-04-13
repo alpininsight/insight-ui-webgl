@@ -1,0 +1,12 @@
+[project]
+name = "insight-ui-webgl-example-standalone"
+version = "0.1.0"
+description = "Example: insight-ui-webgl standalone (no insight-ui base template)."
+requires-python = ">=3.12"
+dependencies = [
+    "django>=6.0",
+    "insight-ui-webgl",
+]
+
+[tool.uv.sources]
+insight-ui-webgl = { path = "../..", editable = true }
