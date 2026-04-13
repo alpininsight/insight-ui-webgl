@@ -31,7 +31,7 @@ TEMPLATES = [
             "context_processors": [
                 "django.template.context_processors.request",
                 "django.template.context_processors.i18n",
-                "insight_ui.config.get_context",
+                "context_processors.insight_ui_context",
             ],
         },
     },
