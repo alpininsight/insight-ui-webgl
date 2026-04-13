@@ -27,3 +27,5 @@ CLAUDE.local.md
 # Playwright artifacts
 .playwright-cli/
 phase*-demo.png
+demo-8765.png
+phase2-refactored.png
