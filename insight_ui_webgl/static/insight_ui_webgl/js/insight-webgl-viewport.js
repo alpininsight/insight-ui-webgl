@@ -50,7 +50,7 @@ export class WebGLViewport {
         this.scene = null;
         this.camera = null;
         this.controls = null;
-        this._animationId = null;
+        this._lastTime = performance.now();
         this._updateCallbacks = new Set();
 
         this._initScene();
@@ -145,32 +145,30 @@ export class WebGLViewport {
 
     /**
      * Start the render loop.
+     *
+     * Uses renderer.setAnimationLoop() (Three.js r150+) instead of manual
+     * requestAnimationFrame. Benefits: automatic cleanup on dispose(),
+     * WebXR-compatible, and the renderer manages the loop lifecycle.
      */
     start() {
-        if (this._animationId !== null) return;
-        let lastTime = performance.now();
-        const animate = (now) => {
-            this._animationId = requestAnimationFrame(animate);
-            const dt = (now - lastTime) / 1000;
-            lastTime = now;
+        this._lastTime = performance.now();
+        this.renderer.setAnimationLoop((now) => {
+            const dt = (now - this._lastTime) / 1000;
+            this._lastTime = now;
 
             this.controls.update();
             for (const cb of this._updateCallbacks) {
                 cb(dt);
             }
             this.renderer.render(this.scene, this.camera);
-        };
-        this._animationId = requestAnimationFrame(animate);
+        });
     }
 
     /**
      * Stop the render loop.
      */
     stop() {
-        if (this._animationId !== null) {
-            cancelAnimationFrame(this._animationId);
-            this._animationId = null;
-        }
+        this.renderer.setAnimationLoop(null);
     }
 
     /**
