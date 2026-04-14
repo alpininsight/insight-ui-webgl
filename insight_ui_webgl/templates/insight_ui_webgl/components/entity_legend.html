@@ -1,0 +1,10 @@
+<div
+  id="{{ tag_id }}"
+  data-entity-legend
+  data-viewport="{{ viewport_id }}"
+  class="flex {% if orientation == 'horizontal' %}flex-row flex-wrap{% else %}flex-col{% endif %} gap-1 p-2"
+  role="group"
+  aria-label="Entity legend"
+>
+  {# Badges are added dynamically via webgl:entity-register events #}
+</div>

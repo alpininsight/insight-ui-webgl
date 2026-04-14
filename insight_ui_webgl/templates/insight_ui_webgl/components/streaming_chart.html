@@ -1,0 +1,16 @@
+{% load insight_webgl_tags %}
+<div
+  id="{{ tag_id }}"
+  data-webgl-streaming-chart
+  data-lane-spacing="{{ lane_spacing }}"
+  data-time-scale="{{ time_scale }}"
+  data-value-scale="{{ value_scale }}"
+  data-sphere-radius="{{ sphere_radius }}"
+  data-sphere-detail="{{ sphere_detail }}"
+  data-tick-debounce="{{ tick_debounce }}"
+  class="relative w-full h-full {{ css_class }}"
+>
+  {% webgl_viewport tag_id=tag_id|add:"-viewport" capacity=capacity max_entities=max_entities camera_position=camera_position camera_target=camera_target fov=fov %}
+  {% webgl_axis tag_id=tag_id|add:"-axis" viewport_id=tag_id|add:"-viewport" x_label=x_label y_label=y_label z_label=z_label %}
+  {% if show_grid %}{% webgl_grid tag_id=tag_id|add:"-grid" viewport_id=tag_id|add:"-viewport" %}{% endif %}
+</div>

@@ -293,3 +293,104 @@ def data_item(
         "timestamp": timestamp,
         "color": color,
     }
+
+
+# ---------------------------------------------------------------------------
+# Molecules (Phase 5)
+# ---------------------------------------------------------------------------
+
+
+@register.inclusion_tag("insight_ui_webgl/components/streaming_chart.html")
+def webgl_streaming_chart(
+    tag_id: str = "webgl-chart",
+    capacity: int = 500,
+    max_entities: int = 20,
+    lane_spacing: int = 10,
+    time_scale: float = 0.2,
+    value_scale: float = 0.3,
+    sphere_radius: float = 0.25,
+    sphere_detail: int = 5,
+    tick_debounce: int = 30,
+    x_label: str = "Time",
+    y_label: str = "Value",
+    z_label: str = "Entity",
+    show_grid: bool = True,
+    camera_position: str = "",
+    camera_target: str = "",
+    fov: int = 55,
+    css_class: str = "",
+) -> dict[str, Any]:
+    """Render a streaming 3D chart with InstancedMesh spheres + sliding window."""
+    return {
+        "tag_id": tag_id,
+        "capacity": capacity,
+        "max_entities": max_entities,
+        "lane_spacing": lane_spacing,
+        "time_scale": time_scale,
+        "value_scale": value_scale,
+        "sphere_radius": sphere_radius,
+        "sphere_detail": sphere_detail,
+        "tick_debounce": tick_debounce,
+        "x_label": x_label,
+        "y_label": y_label,
+        "z_label": z_label,
+        "show_grid": show_grid,
+        "camera_position": camera_position,
+        "camera_target": camera_target,
+        "fov": fov,
+        "css_class": css_class,
+    }
+
+
+@register.inclusion_tag("insight_ui_webgl/components/playback_controls.html")
+def playback_controls(
+    tag_id: str = "playback-controls",
+    viewport_id: str = "",
+    speeds: str = "0.5,1,2,5",
+    default_speed: float = 1.0,
+    show_step: bool = True,
+) -> dict[str, Any]:
+    """Render playback controls (play/pause/step + speed selector)."""
+    return {
+        "tag_id": tag_id,
+        "viewport_id": viewport_id,
+        "speeds": speeds,
+        "default_speed": default_speed,
+        "show_step": show_step,
+    }
+
+
+@register.inclusion_tag("insight_ui_webgl/components/layer_controls.html")
+def layer_controls(
+    tag_id: str = "layer-controls",
+    viewport_id: str = "",
+    layers: str = "",
+) -> dict[str, Any]:
+    """Render checkbox toggles for visibility layers."""
+    import json as _json
+
+    parsed = []
+    if layers:
+        try:
+            parsed = _json.loads(layers)
+        except (ValueError, TypeError):
+            pass
+    return {
+        "tag_id": tag_id,
+        "viewport_id": viewport_id,
+        "layers": parsed,
+    }
+
+
+@register.inclusion_tag("insight_ui_webgl/components/entity_legend.html")
+def entity_legend(
+    tag_id: str = "entity-legend",
+    viewport_id: str = "",
+    orientation: str = "vertical",
+) -> dict[str, Any]:
+    """Render an auto-growing entity legend (populates via webgl:entity-register)."""
+    return {
+        "tag_id": tag_id,
+        "viewport_id": viewport_id,
+        "orientation": orientation,
+    }

@@ -1,0 +1,14 @@
+{% load i18n %}
+<div
+  id="{{ tag_id }}"
+  data-layer-controls
+  data-viewport="{{ viewport_id }}"
+  class="flex flex-col gap-1 p-2"
+>
+  {% for layer in layers %}
+    <label class="flex items-center gap-2 text-sm text-primary cursor-pointer">
+      <input type="checkbox" data-layer="{{ layer.id }}" {% if layer.checked %}checked{% endif %} class="accent-insight-primary">
+      {{ layer.label }}
+    </label>
+  {% endfor %}
+</div>

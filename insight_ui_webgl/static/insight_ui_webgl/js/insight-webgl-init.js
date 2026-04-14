@@ -29,13 +29,13 @@ import { StreamStatus } from "./insight-webgl-stream-status.js";
 import { DataBadge } from "./insight-webgl-data-badge.js";
 import { DataItem } from "./insight-webgl-data-item.js";
 
-// Phase 5: Molecules — uncomment when implemented
-// import { WebGLStreamingChart } from "./insight-webgl-streaming-chart.js";
+// Phase 5: Molecules
+import { WebGLStreamingChart } from "./insight-webgl-streaming-chart.js";
 // import { WebGLOverlayPanel } from "./insight-webgl-overlay-panel.js";
 // import { DataFeed } from "./insight-webgl-data-feed.js";
-// import { EntityLegend } from "./insight-webgl-entity-legend.js";
-// import { PlaybackControls } from "./insight-webgl-playback-controls.js";
-// import { LayerControls } from "./insight-webgl-layer-controls.js";
+import { EntityLegend } from "./insight-webgl-entity-legend.js";
+import { PlaybackControls } from "./insight-webgl-playback-controls.js";
+import { LayerControls } from "./insight-webgl-layer-controls.js";
 
 // Expose component classes for lifecycle cleanup lookups
 window.InsightWebGL = window.InsightWebGL || {};
@@ -58,12 +58,10 @@ Object.assign(window.InsightWebGL, {
     DataBadge,
     DataItem,
     // Phase 5
-    // WebGLStreamingChart,
-    // WebGLOverlayPanel,
-    // DataFeed,
-    // EntityLegend,
-    // PlaybackControls,
-    // LayerControls,
+    WebGLStreamingChart,
+    EntityLegend,
+    PlaybackControls,
+    LayerControls,
 });
 
 function initAll() {
@@ -89,12 +87,10 @@ function initAll() {
     DataItem.initAll();
 
     // Phase 5: Molecules (after atoms — they find child atom instances)
-    // WebGLStreamingChart.initAll();
-    // WebGLOverlayPanel.initAll();
-    // DataFeed.initAll();
-    // EntityLegend.initAll();
-    // PlaybackControls.initAll();
-    // LayerControls.initAll();
+    WebGLStreamingChart.initAll();
+    EntityLegend.initAll();
+    PlaybackControls.initAll();
+    LayerControls.initAll();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
