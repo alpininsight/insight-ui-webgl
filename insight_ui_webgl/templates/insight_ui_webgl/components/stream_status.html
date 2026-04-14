@@ -1,0 +1,15 @@
+{% load i18n %}
+<div
+  id="{{ tag_id }}"
+  data-stream-status
+  data-transport="{{ transport_id }}"
+  data-label-connected="{{ label_connected }}"
+  data-label-disconnected="{{ label_disconnected }}"
+  data-label-connecting="{{ label_connecting }}"
+  class="inline-flex items-center gap-2 px-2 py-1 rounded text-xs"
+  role="status"
+  aria-live="polite"
+>
+  <span data-status-dot class="inline-block w-2 h-2 rounded-full bg-red-500"></span>
+  <span data-status-text>{{ label_disconnected }}</span>
+</div>
