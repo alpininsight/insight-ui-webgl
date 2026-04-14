@@ -269,6 +269,12 @@ class TestWSTransportTag:
         html = self._render('{% ws_transport url="ws://localhost:8765" %}')
         assert 'ws-connect="ws://localhost:8765"' in html
 
+    def test_auto_connect_false_omits_ws_connect(self) -> None:
+        """When auto_connect=False, ws-connect must NOT render (P2 fix)."""
+        html = self._render('{% ws_transport url="ws://localhost:8765" auto_connect=False %}')
+        assert 'data-auto-connect="false"' in html
+        assert 'ws-connect' not in html
+
 
 # ---------------------------------------------------------------------------
 # Phase 4: HTML Atom Tags

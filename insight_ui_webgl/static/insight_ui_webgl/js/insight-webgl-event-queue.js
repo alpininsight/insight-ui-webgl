@@ -35,10 +35,15 @@ export class InsightEventQueue {
 
     /**
      * Set the dispatch function called for each event.
+     * Drains any buffered events that arrived before the dispatcher was set.
      * @param {function(object): void|Promise<void>} fn
      */
     setDispatcher(fn) {
         this._dispatcher = fn;
+        // Drain buffered events that arrived before dispatcher was ready
+        if (this._queue.length > 0) {
+            this._processNext();
+        }
     }
 
     /**
@@ -65,17 +70,16 @@ export class InsightEventQueue {
     // ---- Internal ----
 
     async _processNext() {
-        if (this._processing || this._queue.length === 0) return;
+        // Don't dequeue until a dispatcher is set — buffer events instead
+        if (this._processing || this._queue.length === 0 || !this._dispatcher) return;
         this._processing = true;
 
-        while (this._queue.length > 0) {
+        while (this._queue.length > 0 && this._dispatcher) {
             const event = this._queue.shift();
-            if (this._dispatcher) {
-                try {
-                    await this._dispatcher(event);
-                } catch (err) {
-                    console.error(`[InsightEventQueue] Handler error for ${event.type}:`, err);
-                }
+            try {
+                await this._dispatcher(event);
+            } catch (err) {
+                console.error(`[InsightEventQueue] Handler error for ${event.type}:`, err);
             }
         }
 

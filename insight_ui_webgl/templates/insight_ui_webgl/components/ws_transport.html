@@ -4,7 +4,7 @@
   data-url="{{ url }}"
   data-auto-connect="{{ auto_connect|yesno:'true,false' }}"
   hx-ext="ws"
-  ws-connect="{{ url }}"
+  {% if auto_connect %}ws-connect="{{ url }}"{% endif %}
   class="hidden"
   aria-hidden="true"
 ></div>
