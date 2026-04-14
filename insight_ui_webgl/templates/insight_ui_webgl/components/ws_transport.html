@@ -1,0 +1,10 @@
+<div
+  id="{{ tag_id }}"
+  data-ws-transport
+  data-url="{{ url }}"
+  data-auto-connect="{{ auto_connect|yesno:'true,false' }}"
+  hx-ext="ws"
+  {% if auto_connect %}ws-connect="{{ url }}"{% endif %}
+  class="hidden"
+  aria-hidden="true"
+></div>

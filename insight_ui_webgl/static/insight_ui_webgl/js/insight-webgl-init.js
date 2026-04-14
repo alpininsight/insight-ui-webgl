@@ -18,16 +18,16 @@ import { WebGLOverlayText } from "./insight-webgl-overlay-text.js";
 import { WebGLOverlayLink } from "./insight-webgl-overlay-link.js";
 import { WebGLThresholdPlane } from "./insight-webgl-threshold-plane.js";
 
-// Phase 3: Event System — uncomment when implemented
-// import { InsightEventQueue } from "./insight-webgl-event-queue.js";
-// import { InsightEventRegistry } from "./insight-webgl-event-registry.js";
-// import { InsightSSETransport } from "./insight-webgl-sse-transport.js";
-// import { InsightWSTransport } from "./insight-webgl-ws-transport.js";
+// Phase 3: Event System
+import { InsightEventQueue } from "./insight-webgl-event-queue.js";
+import { InsightEventRegistry } from "./insight-webgl-event-registry.js";
+import { InsightSSETransport } from "./insight-webgl-sse-transport.js";
+import { InsightWSTransport } from "./insight-webgl-ws-transport.js";
 
-// Phase 4: HTML Atoms — uncomment when implemented
-// import { StreamStatus } from "./insight-webgl-stream-status.js";
-// import { DataBadge } from "./insight-webgl-data-badge.js";
-// import { DataItem } from "./insight-webgl-data-item.js";
+// Phase 4: HTML Atoms
+import { StreamStatus } from "./insight-webgl-stream-status.js";
+import { DataBadge } from "./insight-webgl-data-badge.js";
+import { DataItem } from "./insight-webgl-data-item.js";
 
 // Phase 5: Molecules — uncomment when implemented
 // import { WebGLStreamingChart } from "./insight-webgl-streaming-chart.js";
@@ -49,14 +49,14 @@ Object.assign(window.InsightWebGL, {
     WebGLOverlayLink,
     WebGLThresholdPlane,
     // Phase 3
-    // InsightEventQueue,
-    // InsightEventRegistry,
-    // InsightSSETransport,
-    // InsightWSTransport,
+    InsightEventQueue,
+    InsightEventRegistry,
+    InsightSSETransport,
+    InsightWSTransport,
     // Phase 4
-    // StreamStatus,
-    // DataBadge,
-    // DataItem,
+    StreamStatus,
+    DataBadge,
+    DataItem,
     // Phase 5
     // WebGLStreamingChart,
     // WebGLOverlayPanel,
@@ -67,6 +67,12 @@ Object.assign(window.InsightWebGL, {
 });
 
 function initAll() {
+    // Phase 3: Event system first (infrastructure — transports may auto-connect)
+    InsightEventQueue.initAll();
+    InsightEventRegistry.initAll();
+    InsightSSETransport.initAll();
+    InsightWSTransport.initAll();
+
     // Phase 1: WebGL atoms (viewport must be first)
     WebGLViewport.initAll();
     WebGLAxis.initAll();
@@ -77,16 +83,10 @@ function initAll() {
     WebGLOverlayLink.initAll();
     WebGLThresholdPlane.initAll();
 
-    // Phase 3: Event system (infrastructure)
-    // InsightEventQueue.initAll();
-    // InsightEventRegistry.initAll();
-    // InsightSSETransport.initAll();
-    // InsightWSTransport.initAll();
-
     // Phase 4: HTML atoms
-    // StreamStatus.initAll();
-    // DataBadge.initAll();
-    // DataItem.initAll();
+    StreamStatus.initAll();
+    DataBadge.initAll();
+    DataItem.initAll();
 
     // Phase 5: Molecules (after atoms — they find child atom instances)
     // WebGLStreamingChart.initAll();

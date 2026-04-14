@@ -171,3 +171,125 @@ def webgl_threshold_plane(
         "depth": depth,
         "visible": visible,
     }
+
+
+# ---------------------------------------------------------------------------
+# Event System (Phase 3) — phantom div pattern
+# ---------------------------------------------------------------------------
+
+
+@register.inclusion_tag("insight_ui_webgl/components/event_queue.html")
+def event_queue(
+    tag_id: str = "event-queue",
+) -> dict[str, Any]:
+    """Render a FIFO event queue (infrastructure, invisible)."""
+    return {"tag_id": tag_id}
+
+
+@register.inclusion_tag("insight_ui_webgl/components/event_registry.html")
+def event_registry(
+    tag_id: str = "event-registry",
+) -> dict[str, Any]:
+    """Render a handler registry (infrastructure, invisible)."""
+    return {"tag_id": tag_id}
+
+
+@register.inclusion_tag("insight_ui_webgl/components/sse_transport.html")
+def sse_transport(
+    tag_id: str = "sse-transport",
+    url: str = "",
+    channel: str = "",
+    reconnect_delay: int = 1000,
+    max_reconnect_delay: int = 30000,
+    auto_connect: bool = True,
+) -> dict[str, Any]:
+    """Render an SSE transport with reconnect logic (infrastructure, invisible)."""
+    full_url = url
+    if channel and "?" not in url:
+        full_url = f"{url}?channel={channel}"
+    elif channel:
+        full_url = f"{url}&channel={channel}"
+    return {
+        "tag_id": tag_id,
+        "url": full_url,
+        "reconnect_delay": reconnect_delay,
+        "max_reconnect_delay": max_reconnect_delay,
+        "auto_connect": auto_connect,
+    }
+
+
+@register.inclusion_tag("insight_ui_webgl/components/ws_transport.html")
+def ws_transport(
+    tag_id: str = "ws-transport",
+    url: str = "",
+    auto_connect: bool = True,
+) -> dict[str, Any]:
+    """Render a WebSocket transport bridging htmx ws extension (infrastructure, invisible)."""
+    return {
+        "tag_id": tag_id,
+        "url": url,
+        "auto_connect": auto_connect,
+    }
+
+
+# ---------------------------------------------------------------------------
+# HTML Atoms (Phase 4)
+# ---------------------------------------------------------------------------
+
+
+@register.inclusion_tag("insight_ui_webgl/components/stream_status.html")
+def stream_status(
+    tag_id: str = "stream-status",
+    transport_id: str = "",
+    label_connected: str = "Connected",
+    label_disconnected: str = "Disconnected",
+    label_connecting: str = "Connecting...",
+) -> dict[str, Any]:
+    """Render a connection status indicator (dot + text)."""
+    return {
+        "tag_id": tag_id,
+        "transport_id": transport_id,
+        "label_connected": label_connected,
+        "label_disconnected": label_disconnected,
+        "label_connecting": label_connecting,
+    }
+
+
+@register.inclusion_tag("insight_ui_webgl/components/data_badge.html")
+def data_badge(
+    tag_id: str = "",
+    entity_id: str = "",
+    label: str = "",
+    color: str = "#888888",
+    value: str = "",
+    active: bool = True,
+) -> dict[str, Any]:
+    """Render a clickable entity badge/chip with color dot."""
+    return {
+        "tag_id": tag_id,
+        "entity_id": entity_id,
+        "label": label,
+        "color": color,
+        "value": value,
+        "active": active,
+    }
+
+
+@register.inclusion_tag("insight_ui_webgl/components/data_item.html")
+def data_item(
+    tag_id: str = "",
+    entity_id: str = "",
+    title: str = "",
+    subtitle: str = "",
+    timestamp: str = "",
+    color: str = "",
+) -> dict[str, Any]:
+    """Render a single data feed item."""
+    return {
+        "tag_id": tag_id,
+        "entity_id": entity_id,
+        "title": title,
+        "subtitle": subtitle,
+        "timestamp": timestamp,
+        "color": color,
+    }

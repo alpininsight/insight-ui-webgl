@@ -201,3 +201,149 @@ class TestWebGLThresholdPlaneTag:
         assert 'data-width="200"' in html
         assert 'data-depth="80"' in html
         assert 'data-visible="false"' in html
+
+
+# ---------------------------------------------------------------------------
+# Phase 3: Event System Tags
+# ---------------------------------------------------------------------------
+
+
+class TestEventQueueTag:
+    def _render(self, tag_string: str) -> str:
+        template = Template(f"{{% load insight_webgl_tags %}}{tag_string}")
+        return template.render(Context())
+
+    def test_default(self) -> None:
+        html = self._render("{% event_queue %}")
+        assert 'data-event-queue' in html
+        assert 'id="event-queue"' in html
+        assert 'class="hidden"' in html
+
+    def test_custom_id(self) -> None:
+        html = self._render('{% event_queue tag_id="eq-main" %}')
+        assert 'id="eq-main"' in html
+
+
+class TestEventRegistryTag:
+    def _render(self, tag_string: str) -> str:
+        template = Template(f"{{% load insight_webgl_tags %}}{tag_string}")
+        return template.render(Context())
+
+    def test_default(self) -> None:
+        html = self._render("{% event_registry %}")
+        assert 'data-event-registry' in html
+        assert 'id="event-registry"' in html
+
+
+class TestSSETransportTag:
+    def _render(self, tag_string: str) -> str:
+        template = Template(f"{{% load insight_webgl_tags %}}{tag_string}")
+        return template.render(Context())
+
+    def test_default(self) -> None:
+        html = self._render("{% sse_transport %}")
+        assert 'data-sse-transport' in html
+        assert 'data-auto-connect="true"' in html
+
+    def test_with_channel(self) -> None:
+        html = self._render('{% sse_transport url="/api/events/sse/" channel="equity" %}')
+        assert 'data-url="/api/events/sse/?channel=equity"' in html
+
+    def test_custom_reconnect(self) -> None:
+        html = self._render('{% sse_transport reconnect_delay=2000 max_reconnect_delay=60000 %}')
+        assert 'data-reconnect-delay="2000"' in html
+        assert 'data-max-reconnect-delay="60000"' in html
+
+
+class TestWSTransportTag:
+    def _render(self, tag_string: str) -> str:
+        template = Template(f"{{% load insight_webgl_tags %}}{tag_string}")
+        return template.render(Context())
+
+    def test_default(self) -> None:
+        html = self._render("{% ws_transport %}")
+        assert 'data-ws-transport' in html
+        assert 'hx-ext="ws"' in html
+
+    def test_with_url(self) -> None:
+        html = self._render('{% ws_transport url="ws://localhost:8765" %}')
+        assert 'ws-connect="ws://localhost:8765"' in html
+
+    def test_auto_connect_false_omits_ws_connect(self) -> None:
+        """When auto_connect=False, ws-connect must NOT render (P2 fix)."""
+        html = self._render('{% ws_transport url="ws://localhost:8765" auto_connect=False %}')
+        assert 'data-auto-connect="false"' in html
+        assert 'ws-connect' not in html
+
+
+# ---------------------------------------------------------------------------
+# Phase 4: HTML Atom Tags
+# ---------------------------------------------------------------------------
+
+
+class TestStreamStatusTag:
+    def _render(self, tag_string: str) -> str:
+        template = Template(f"{{% load insight_webgl_tags %}}{tag_string}")
+        return template.render(Context())
+
+    def test_default(self) -> None:
+        html = self._render("{% stream_status %}")
+        assert 'data-stream-status' in html
+        assert 'data-status-dot' in html
+        assert 'data-status-text' in html
+        assert 'role="status"' in html
+        assert 'aria-live="polite"' in html
+
+    def test_custom_labels(self) -> None:
+        html = self._render(
+            '{% stream_status label_connected="Online" label_disconnected="Offline" %}'
+        )
+        assert 'data-label-connected="Online"' in html
+        assert 'data-label-disconnected="Offline"' in html
+
+
+class TestDataBadgeTag:
+    def _render(self, tag_string: str) -> str:
+        template = Template(f"{{% load insight_webgl_tags %}}{tag_string}")
+        return template.render(Context())
+
+    def test_default(self) -> None:
+        html = self._render("{% data_badge %}")
+        assert 'data-data-badge' in html
+        assert 'role="button"' in html
+        assert 'tabindex="0"' in html
+
+    def test_with_entity(self) -> None:
+        html = self._render('{% data_badge entity_id="SAP" label="SAP SE" color="#ff0000" %}')
+        assert 'data-entity="SAP"' in html
+        assert 'SAP SE' in html
+        assert 'background-color: #ff0000' in html
+
+    def test_inactive(self) -> None:
+        html = self._render('{% data_badge active=False %}')
+        assert 'aria-pressed="false"' in html
+        assert 'opacity-50' in html
+
+
+class TestDataItemTag:
+    def _render(self, tag_string: str) -> str:
+        template = Template(f"{{% load insight_webgl_tags %}}{tag_string}")
+        return template.render(Context())
+
+    def test_default(self) -> None:
+        html = self._render("{% data_item %}")
+        assert 'data-data-item' in html
+        assert 'role="listitem"' in html
+
+    def test_with_content(self) -> None:
+        html = self._render(
+            '{% data_item entity_id="AAPL" title="Earnings Beat" subtitle="+5.2%" timestamp="14:30" %}'
+        )
+        assert 'data-entity="AAPL"' in html
+        assert 'Earnings Beat' in html
+        assert '+5.2%' in html
+        assert '14:30' in html
+
+    def test_with_color(self) -> None:
+        html = self._render('{% data_item color="#10b981" %}')
+        assert 'background: #10b981' in html

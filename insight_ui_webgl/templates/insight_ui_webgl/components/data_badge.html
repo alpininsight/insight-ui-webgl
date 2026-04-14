@@ -1,0 +1,16 @@
+<span
+  {% if tag_id %}id="{{ tag_id }}"{% endif %}
+  data-data-badge
+  data-entity="{{ entity_id }}"
+  data-color="{{ color }}"
+  class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs border border-gray-200 dark:border-gray-600 {% if active %}text-primary{% else %}text-secondary opacity-50{% endif %} cursor-pointer select-none"
+  role="button"
+  tabindex="0"
+  aria-pressed="{{ active|yesno:'true,false' }}"
+>
+  <span class="inline-block w-2 h-2 rounded-full" style="background-color: {{ color }}"></span>
+  <span data-badge-label>{{ label }}</span>
+  {% if value %}
+    <span data-badge-value class="font-mono text-secondary">{{ value }}</span>
+  {% endif %}
+</span>

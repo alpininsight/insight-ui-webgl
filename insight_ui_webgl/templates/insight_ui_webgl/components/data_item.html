@@ -1,0 +1,20 @@
+<div
+  {% if tag_id %}id="{{ tag_id }}"{% endif %}
+  data-data-item
+  data-entity="{{ entity_id }}"
+  class="flex items-start gap-2 px-2 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer transition-colors text-sm"
+  role="listitem"
+>
+  {% if color %}
+    <span class="mt-1 w-2 h-2 rounded-full shrink-0" style="background: {{ color }}"></span>
+  {% endif %}
+  <div class="min-w-0 flex-1">
+    <p class="text-primary truncate">{{ title }}</p>
+    {% if subtitle %}
+      <p class="text-secondary text-xs truncate">{{ subtitle }}</p>
+    {% endif %}
+  </div>
+  {% if timestamp %}
+    <time class="text-secondary text-xs whitespace-nowrap shrink-0">{{ timestamp }}</time>
+  {% endif %}
+</div>
