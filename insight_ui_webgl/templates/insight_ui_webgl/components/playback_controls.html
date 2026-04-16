@@ -1,0 +1,23 @@
+{% load i18n %}
+<div
+  id="{{ tag_id }}"
+  data-playback-controls
+  data-viewport="{{ viewport_id }}"
+  data-speeds="{{ speeds }}"
+  data-default-speed="{{ default_speed }}"
+  class="flex items-center gap-2 px-3 py-2"
+>
+  {% if show_step %}
+    <button data-action="step-back" class="btn btn-sm btn-subtil" aria-label="{% trans 'Step back' %}">&#9664;&#9664;</button>
+  {% endif %}
+  <button data-action="play" class="btn btn-sm btn-subtil" aria-label="{% trans 'Play' %}">&#9654;</button>
+  <button data-action="pause" class="btn btn-sm btn-subtil" aria-label="{% trans 'Pause' %}">&#9646;&#9646;</button>
+  {% if show_step %}
+    <button data-action="step-forward" class="btn btn-sm btn-subtil" aria-label="{% trans 'Step forward' %}">&#9654;&#9654;</button>
+  {% endif %}
+  <label class="flex items-center gap-1 text-xs text-secondary">
+    <span>{% trans "Speed" %}</span>
+    <select data-action="speed" class="text-xs border rounded px-1 py-0.5 dark:bg-gray-800"></select>
+  </label>
+  <span data-tick-counter class="text-xs text-secondary font-mono">0 ticks</span>
+</div>

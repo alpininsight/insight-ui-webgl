@@ -1,26 +1,11 @@
 {% load static insight_webgl_tags %}
-{#
-  Minimal standalone demo for insight-ui-webgl.
-
-  This template uses the insight-ui design-token system (CSS custom
-  properties with hardcoded fallbacks). It does NOT extend
-  insight_ui/base.html — for the full integration pattern see
-  examples/with-insight-ui/ where base.html is extended properly.
-
-  Color policy (same as insight-ui-user PR #21):
-    background-color: var(--color-insight-primary, #3b82f6);
-
-  When insight-ui ships the WebGL tokens from issue #129, the fallback
-  values below become dead code — the variables alone will resolve.
-#}
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>insight-ui-webgl — Standalone Demo</title>
+  <title>insight-ui-webgl — Live Kafka Demo</title>
 
-  {# Three.js vendored locally (cdnjs has no addons; OrbitControls from upstream r180) #}
   <script type="importmap">
   {
     "imports": {
@@ -30,190 +15,182 @@
   }
   </script>
 
-  {# HTMX from Cloudflare CDN for lifecycle hooks #}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.4/htmx.min.js"></script>
 
   <style>
-    /*
-     * Local fallback tokens — match insight-ui upstream names. When
-     * insight-ui ships these variables (issue #129), remove this block
-     * and the host theme takes over automatically.
-     */
     :root {
       --color-insight-primary: #3b82f6;
-      --color-insight-text-primary: #1a1a1a;
-      --color-insight-text-secondary: #6b7280;
       --color-insight-success: #10b981;
-      --color-insight-webgl-bg: #0a0a14;
-      --color-insight-webgl-axis-x: #ff6b6b;
-      --color-insight-webgl-axis-y: #6bcf7f;
-      --color-insight-webgl-axis-z: #4fa3ff;
-      --color-insight-webgl-grid-center: #3b82f6;
-      --color-insight-webgl-grid-line: #1a1a2e;
-    }
-    [data-theme="dark"] {
+      --color-insight-danger: #ef4444;
+      --color-insight-warning: #f59e0b;
       --color-insight-text-primary: #e0e0e0;
       --color-insight-text-secondary: #9ca3af;
       --surface-1: #0a0a14;
       --surface-2: #1a1a2e;
       --surface-border: #2a2a3e;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      height: 100%;
-      font-family: "insight-ui", -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--surface-1);
-      color: var(--color-insight-text-primary);
-    }
+    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--surface-1); color: var(--color-insight-text-primary); }
     body { display: flex; flex-direction: column; }
-
-    header {
-      padding: 16px 24px;
-      background: var(--surface-2);
-      border-bottom: 1px solid var(--surface-border);
-    }
-    h1 { font-size: 18px; margin-bottom: 4px; font-weight: 600; }
-    .subtitle { font-size: 13px; color: var(--color-insight-text-secondary); }
-    .badge-status {
-      display: inline-block;
-      margin-left: 12px;
-      padding: 2px 8px;
-      background: var(--color-insight-success);
-      color: #000;
-      border-radius: 3px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    main {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 1fr 280px;
-      grid-template-rows: 1fr;
-      gap: 12px;
-      padding: 12px;
-      min-height: 0;
-      overflow: hidden;
-    }
-    .viewport-wrapper {
-      position: relative;
-      background: var(--surface-2);
-      border-radius: 6px;
-      overflow: hidden;
-      min-height: 0;
-    }
-    #demo-viewport-container { position: absolute; inset: 0; }
-
-    aside {
-      background: var(--surface-2);
-      border-radius: 6px;
-      padding: 16px;
-      font-size: 13px;
-      line-height: 1.6;
-      overflow-y: auto;
-    }
-    aside h2 { font-size: 14px; margin-bottom: 8px; font-weight: 600; }
-    aside ul { list-style: none; margin-bottom: 16px; }
-    aside li { padding: 4px 0; color: var(--color-insight-text-secondary); }
-    aside li::before { content: "▸ "; color: var(--color-insight-primary); }
-    aside code {
-      background: var(--surface-1);
-      padding: 1px 5px;
-      border-radius: 2px;
-      font-size: 11px;
-      color: var(--color-insight-primary);
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 0;
-    }
-    .legend-dot { width: 12px; height: 2px; }
-    .axis-x { background: var(--color-insight-webgl-axis-x); }
-    .axis-y { background: var(--color-insight-webgl-axis-y); }
-    .axis-z { background: var(--color-insight-webgl-axis-z); }
+    header { padding: 12px 24px; background: var(--surface-2); border-bottom: 1px solid var(--surface-border); display: flex; justify-content: space-between; align-items: center; }
+    h1 { font-size: 16px; font-weight: 600; }
+    .badge { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+    .badge-live { background: var(--color-insight-danger); color: #fff; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    main { flex: 1; display: grid; grid-template-columns: 1fr 260px; grid-template-rows: 1fr auto; gap: 8px; padding: 8px; min-height: 0; overflow: hidden; }
+    .chart-area { position: relative; background: var(--surface-2); border-radius: 6px; overflow: hidden; min-height: 0; }
+    #webgl-chart-viewport-container { position: absolute; inset: 0; }
+    aside { background: var(--surface-2); border-radius: 6px; padding: 12px; font-size: 13px; overflow-y: auto; }
+    aside h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; color: var(--color-insight-text-secondary); }
+    aside h3:not(:first-child) { margin-top: 16px; }
+    .controls-bar { grid-column: span 2; background: var(--surface-2); border-radius: 6px; display: flex; align-items: center; gap: 16px; padding: 0 12px; }
+    .btn { padding: 4px 12px; border: 1px solid var(--surface-border); border-radius: 4px; background: var(--surface-2); color: var(--color-insight-text-primary); cursor: pointer; font-size: 13px; }
+    .btn:hover { background: var(--surface-border); }
+    .btn-sm { padding: 2px 8px; font-size: 12px; }
+    .btn-subtil { background: transparent; border: none; }
+    .symbol-option { display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer; font-size: 13px; }
+    .symbol-option input[type="checkbox"] { accent-color: var(--color-insight-primary); }
+    .symbol-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .symbol-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+    .symbol-name { font-weight: 600; font-size: 12px; }
+    .symbol-type { font-size: 10px; color: var(--color-insight-text-secondary); }
+    .symbol-price { font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-insight-text-secondary); text-align: right; }
+    .y-axis-hint { font-size: 11px; color: var(--color-insight-text-secondary); padding: 4px 8px; background: var(--surface-1); border-radius: 4px; margin-top: 4px; }
   </style>
 
-  <script>window.JS_DEBUG = true;</script>
+  <script>window.JS_DEBUG = false;</script>
   <script src="{% static 'insight_ui_webgl/js/insight-webgl-utils.js' %}"></script>
   <script type="module" src="{% static 'insight_ui_webgl/js/insight-webgl-init.js' %}"></script>
 </head>
 <body>
   <header>
-    <h1>insight-ui-webgl — Standalone Demo <span class="badge-status">PHASE 2 COMPLETE</span></h1>
-    <div class="subtitle">Design tokens via <code>var(--color-insight-*)</code> — see insight-ui issue #129</div>
+    <div>
+      <h1>insight-ui-webgl <span class="badge badge-live">LIVE</span></h1>
+      <div style="font-size:12px; color:var(--color-insight-text-secondary)">Kafka &rarr; SSE &rarr; WebGL Streaming Chart</div>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      {% stream_status tag_id="sse-status" transport_id="kafka-sse" %}
+    </div>
   </header>
 
   <main>
-    <div class="viewport-wrapper">
-      {% webgl_viewport tag_id="demo-viewport" camera_position="80,60,80" camera_target="50,15,25" fov=55 %}
-      {% webgl_grid tag_id="demo-grid" viewport_id="demo-viewport" size=100 divisions=20 plane="xz" %}
-      {% webgl_axis tag_id="demo-axis" viewport_id="demo-viewport" x_label="Time" y_label="Price" z_label="Entity" x_length=100 y_length=60 z_length=50 %}
-      {% webgl_overlay_text tag_id="demo-text" viewport_id="demo-viewport" %}
-      {% webgl_overlay_link tag_id="demo-links" viewport_id="demo-viewport" color_map='{"credit":"#ff6b6b","market":"#4ecdc4","liquidity":"#ffe66d"}' %}
-      {% webgl_threshold_plane tag_id="demo-threshold" viewport_id="demo-viewport" height=25 opacity=0.18 width=100 depth=50 %}
+    <div class="chart-area">
+      {% webgl_streaming_chart tag_id="webgl-chart" capacity=1000 max_entities=10 lane_spacing=10 time_scale=0.1 value_scale=4.0 sphere_radius=0.3 x_label="Time" y_label="Δ%" z_label="Symbol" camera_position="70,45,70" camera_target="50,15,10" fov=55 %}
     </div>
 
     <aside>
-      <h2>Phase 1 — Foundation</h2>
-      <ul>
-        <li><code>webgl_viewport</code></li>
-        <li><code>webgl_grid</code></li>
-        <li><code>webgl_axis</code></li>
-      </ul>
+      <h3>Available Symbols</h3>
+      <div id="symbol-selector">
+        <label class="symbol-option">
+          <input type="checkbox" data-symbol="AAPL" checked>
+          <span class="symbol-dot" style="background:#ff6b6b"></span>
+          <div class="symbol-info">
+            <span class="symbol-name">AAPL</span>
+            <span class="symbol-type">Apple Inc. &middot; NASDAQ</span>
+          </div>
+          <span class="symbol-price" data-price="AAPL">&mdash;</span>
+        </label>
+        <label class="symbol-option">
+          <input type="checkbox" data-symbol="BTC-USD" checked>
+          <span class="symbol-dot" style="background:#4ecdc4"></span>
+          <div class="symbol-info">
+            <span class="symbol-name">BTC-USD</span>
+            <span class="symbol-type">Bitcoin &middot; Crypto</span>
+          </div>
+          <span class="symbol-price" data-price="BTC-USD">&mdash;</span>
+        </label>
+        <label class="symbol-option">
+          <input type="checkbox" data-symbol="ETH-USD" checked>
+          <span class="symbol-dot" style="background:#ffe66d"></span>
+          <div class="symbol-info">
+            <span class="symbol-name">ETH-USD</span>
+            <span class="symbol-type">Ethereum &middot; Crypto</span>
+          </div>
+          <span class="symbol-price" data-price="ETH-USD">&mdash;</span>
+        </label>
+      </div>
+      <div class="y-axis-hint">
+        Y-axis: daily change %<br>
+        (normalized, all symbols comparable)
+      </div>
 
-      <h2>Phase 2 — Overlays</h2>
-      <ul>
-        <li><code>webgl_overlay_text</code></li>
-        <li><code>webgl_overlay_link</code></li>
-        <li><code>webgl_threshold_plane</code></li>
-      </ul>
-
-      <h2>Try It</h2>
-      <ul>
-        <li><strong>Drag</strong> — orbit the camera</li>
-        <li><strong>Scroll</strong> — zoom</li>
-        <li><strong>Right-drag</strong> — pan</li>
-      </ul>
-
-      <h2>Axis Legend</h2>
-      <div class="legend-item"><div class="legend-dot axis-x"></div><span>X — Time</span></div>
-      <div class="legend-item"><div class="legend-dot axis-y"></div><span>Y — Price</span></div>
-      <div class="legend-item"><div class="legend-dot axis-z"></div><span>Z — Entity</span></div>
-
-      <h2>Design Tokens</h2>
-      <ul>
-        <li>All colors via insight-ui CSS vars</li>
-        <li>Host app can override via <code>:root</code></li>
-        <li>See <code>examples/with-insight-ui/</code></li>
-        <li>Upstream: insight-ui#129</li>
-      </ul>
+      <h3>Event Stats</h3>
+      <div style="font-size:12px; color:var(--color-insight-text-secondary)">
+        Events received: <span id="event-count" style="color:var(--color-insight-text-primary); font-family:monospace">0</span><br>
+        Last symbol: <span id="last-symbol" style="color:var(--color-insight-text-primary); font-family:monospace">&mdash;</span>
+      </div>
     </aside>
+
+    <div class="controls-bar">
+      {% playback_controls tag_id="playback" viewport_id="webgl-chart" speeds="0.5,1,2,5,10" %}
+    </div>
   </main>
 
+  {# Event Infrastructure (invisible) #}
+  {% sse_transport tag_id="kafka-sse" url="/api/events/sse/" channel="equity" %}
+  {% event_queue tag_id="eq" %}
+  {% event_registry tag_id="er" %}
+
   <script type="module">
-    // Phase 2 demo: populate overlays with sample data after init.
-    // In a real app these would be driven by SSE/WS events via the
-    // event_queue/event_registry components (Phase 3).
+    // Symbol filter — which tickers to plot
+    const enabled = new Set(["AAPL", "BTC-USD", "ETH-USD"]);
+    document.querySelectorAll("#symbol-selector input[type='checkbox']").forEach((cb) => {
+      cb.addEventListener("change", () => {
+        if (cb.checked) enabled.add(cb.dataset.symbol);
+        else enabled.delete(cb.dataset.symbol);
+      });
+    });
+
+    // Wire: SSE → EventQueue → EventRegistry → StreamingChart
     document.addEventListener("DOMContentLoaded", () => {
-      setTimeout(() => {
-        const txt = window.InsightWebGL.WebGLOverlayText.instances.get(
-          document.getElementById("demo-text"));
-        const lnk = window.InsightWebGL.WebGLOverlayLink.instances.get(
-          document.getElementById("demo-links"));
-        if (!txt || !lnk) return;
+      const chart = InsightWebGL.WebGLStreamingChart.instances.get(
+        document.getElementById("webgl-chart"));
+      const registry = InsightWebGL.InsightEventRegistry.instances.get(
+        document.querySelector("[data-event-registry]"));
+      const queue = InsightWebGL.InsightEventQueue.instances.get(
+        document.querySelector("[data-event-queue]"));
 
-        txt.create("a1", "Earnings Beat", [20, 18, 10]);
-        txt.create("a2", "Downgrade", [50, 12, 25], { color: "#ff4444" });
-        txt.create("a3", "Buy Signal", [80, 22, 40], { color: "#10b981" });
+      if (!chart || !registry || !queue) {
+        console.error("Missing components:", { chart: !!chart, registry: !!registry, queue: !!queue });
+        return;
+      }
 
-        lnk.create("l1", [20, 18, 10], [50, 12, 25], "credit", 0.7);
-        lnk.create("l2", [50, 12, 25], [80, 22, 40], "market", 0.5);
+      let eventCount = 0;
+      const countEl = document.getElementById("event-count");
+      const lastSymbolEl = document.getElementById("last-symbol");
 
-        debugLog("Phase 2 demo content seeded.");
-      }, 100);
+      // Domain handler: price_tick → chart
+      // Uses change_percent so all symbols (AAPL $260, ETH $2338, BTC $74000)
+      // are comparable on the same Y-axis.
+      registry.register("price_tick", (event) => {
+        if (!event.entity || event.change_percent == null) return;
+        if (!enabled.has(event.entity)) return;
+
+        chart.addPoint(event.entity, event.change_percent);
+
+        // Update UI stats
+        eventCount++;
+        countEl.textContent = eventCount;
+        lastSymbolEl.textContent = event.entity;
+
+        // Update price badge in selector
+        const priceEl = document.querySelector(`[data-price="${event.entity}"]`);
+        if (priceEl && event.price != null) {
+          const p = event.price;
+          const formatted = p >= 10000 ? `$${p.toFixed(0)}` : `$${p.toFixed(2)}`;
+          priceEl.textContent = formatted;
+        }
+      });
+
+      // Wire queue dispatcher → registry
+      queue.setDispatcher(async (event) => {
+        for (const entry of registry.getHandlers(event.type)) {
+          try { await entry.handler(event); }
+          catch (err) { console.error("Handler error:", err); }
+        }
+      });
+
+      console.log("[Demo] Live Kafka wiring ready. Enabled:", [...enabled]);
     });
   </script>
 </body>
