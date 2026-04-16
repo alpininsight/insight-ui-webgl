@@ -112,8 +112,10 @@ class Command(BaseCommand):
                 if count % 10 == 0:
                     self.stdout.write(f"  {count} events stored (latest: {symbol} ${price:.2f})")
 
-            except (json.JSONDecodeError, KeyError, TypeError) as e:
-                self.stderr.write(f"Parse error: {e}")
+            except (json.JSONDecodeError, KeyError, TypeError, ValueError) as e:
+                # ValueError covers float() on non-numeric prices — a single
+                # malformed message must not terminate the long-running consumer.
+                self.stderr.write(f"Parse error (skipping): {e}")
 
         consumer.close()
         self.stdout.write(f"Done. {count} events stored total.")

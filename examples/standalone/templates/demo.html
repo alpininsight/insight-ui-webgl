@@ -37,19 +37,28 @@
     .badge { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }
     .badge-live { background: var(--color-insight-danger); color: #fff; animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-    main { flex: 1; display: grid; grid-template-columns: 1fr 220px; grid-template-rows: 1fr auto; gap: 8px; padding: 8px; min-height: 0; overflow: hidden; }
+    main { flex: 1; display: grid; grid-template-columns: 1fr 260px; grid-template-rows: 1fr auto; gap: 8px; padding: 8px; min-height: 0; overflow: hidden; }
     .chart-area { position: relative; background: var(--surface-2); border-radius: 6px; overflow: hidden; min-height: 0; }
     #webgl-chart-viewport-container { position: absolute; inset: 0; }
     aside { background: var(--surface-2); border-radius: 6px; padding: 12px; font-size: 13px; overflow-y: auto; }
-    aside h3 { font-size: 13px; margin-bottom: 6px; color: var(--color-insight-text-primary); }
+    aside h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; color: var(--color-insight-text-secondary); }
+    aside h3:not(:first-child) { margin-top: 16px; }
     .controls-bar { grid-column: span 2; background: var(--surface-2); border-radius: 6px; display: flex; align-items: center; gap: 16px; padding: 0 12px; }
     .btn { padding: 4px 12px; border: 1px solid var(--surface-border); border-radius: 4px; background: var(--surface-2); color: var(--color-insight-text-primary); cursor: pointer; font-size: 13px; }
     .btn:hover { background: var(--surface-border); }
     .btn-sm { padding: 2px 8px; font-size: 12px; }
     .btn-subtil { background: transparent; border: none; }
+    .symbol-option { display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer; font-size: 13px; }
+    .symbol-option input[type="checkbox"] { accent-color: var(--color-insight-primary); }
+    .symbol-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .symbol-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+    .symbol-name { font-weight: 600; font-size: 12px; }
+    .symbol-type { font-size: 10px; color: var(--color-insight-text-secondary); }
+    .symbol-price { font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-insight-text-secondary); text-align: right; }
+    .y-axis-hint { font-size: 11px; color: var(--color-insight-text-secondary); padding: 4px 8px; background: var(--surface-1); border-radius: 4px; margin-top: 4px; }
   </style>
 
-  <script>window.JS_DEBUG = true;</script>
+  <script>window.JS_DEBUG = false;</script>
   <script src="{% static 'insight_ui_webgl/js/insight-webgl-utils.js' %}"></script>
   <script type="module" src="{% static 'insight_ui_webgl/js/insight-webgl-init.js' %}"></script>
 </head>
@@ -66,15 +75,50 @@
 
   <main>
     <div class="chart-area">
-      {% webgl_streaming_chart tag_id="webgl-chart" capacity=2000 max_entities=10 lane_spacing=10 time_scale=0.05 value_scale=0.0004 sphere_radius=0.3 x_label="Time" y_label="Price" z_label="Symbol" camera_position="60,40,60" camera_target="50,20,5" fov=55 %}
+      {% webgl_streaming_chart tag_id="webgl-chart" capacity=1000 max_entities=10 lane_spacing=10 time_scale=0.1 value_scale=4.0 sphere_radius=0.3 x_label="Time" y_label="Δ%" z_label="Symbol" camera_position="70,45,70" camera_target="50,15,10" fov=55 %}
     </div>
 
     <aside>
-      <h3>Symbols</h3>
-      {% entity_legend tag_id="legend" viewport_id="webgl-chart" %}
+      <h3>Available Symbols</h3>
+      <div id="symbol-selector">
+        <label class="symbol-option">
+          <input type="checkbox" data-symbol="AAPL" checked>
+          <span class="symbol-dot" style="background:#ff6b6b"></span>
+          <div class="symbol-info">
+            <span class="symbol-name">AAPL</span>
+            <span class="symbol-type">Apple Inc. &middot; NASDAQ</span>
+          </div>
+          <span class="symbol-price" data-price="AAPL">&mdash;</span>
+        </label>
+        <label class="symbol-option">
+          <input type="checkbox" data-symbol="BTC-USD" checked>
+          <span class="symbol-dot" style="background:#4ecdc4"></span>
+          <div class="symbol-info">
+            <span class="symbol-name">BTC-USD</span>
+            <span class="symbol-type">Bitcoin &middot; Crypto</span>
+          </div>
+          <span class="symbol-price" data-price="BTC-USD">&mdash;</span>
+        </label>
+        <label class="symbol-option">
+          <input type="checkbox" data-symbol="ETH-USD" checked>
+          <span class="symbol-dot" style="background:#ffe66d"></span>
+          <div class="symbol-info">
+            <span class="symbol-name">ETH-USD</span>
+            <span class="symbol-type">Ethereum &middot; Crypto</span>
+          </div>
+          <span class="symbol-price" data-price="ETH-USD">&mdash;</span>
+        </label>
+      </div>
+      <div class="y-axis-hint">
+        Y-axis: daily change %<br>
+        (normalized, all symbols comparable)
+      </div>
 
-      <h3 style="margin-top:16px">Layers</h3>
-      {% layer_controls tag_id="layers" viewport_id="webgl-chart" %}
+      <h3>Event Stats</h3>
+      <div style="font-size:12px; color:var(--color-insight-text-secondary)">
+        Events received: <span id="event-count" style="color:var(--color-insight-text-primary); font-family:monospace">0</span><br>
+        Last symbol: <span id="last-symbol" style="color:var(--color-insight-text-primary); font-family:monospace">&mdash;</span>
+      </div>
     </aside>
 
     <div class="controls-bar">
@@ -88,6 +132,15 @@
   {% event_registry tag_id="er" %}
 
   <script type="module">
+    // Symbol filter — which tickers to plot
+    const enabled = new Set(["AAPL", "BTC-USD", "ETH-USD"]);
+    document.querySelectorAll("#symbol-selector input[type='checkbox']").forEach((cb) => {
+      cb.addEventListener("change", () => {
+        if (cb.checked) enabled.add(cb.dataset.symbol);
+        else enabled.delete(cb.dataset.symbol);
+      });
+    });
+
     // Wire: SSE → EventQueue → EventRegistry → StreamingChart
     document.addEventListener("DOMContentLoaded", () => {
       const chart = InsightWebGL.WebGLStreamingChart.instances.get(
@@ -102,10 +155,30 @@
         return;
       }
 
-      // Register domain handler: price_tick → chart.addPoint
+      let eventCount = 0;
+      const countEl = document.getElementById("event-count");
+      const lastSymbolEl = document.getElementById("last-symbol");
+
+      // Domain handler: price_tick → chart
+      // Uses change_percent so all symbols (AAPL $260, ETH $2338, BTC $74000)
+      // are comparable on the same Y-axis.
       registry.register("price_tick", (event) => {
-        if (event.entity && event.price != null) {
-          chart.addPoint(event.entity, event.price);
+        if (!event.entity || event.change_percent == null) return;
+        if (!enabled.has(event.entity)) return;
+
+        chart.addPoint(event.entity, event.change_percent);
+
+        // Update UI stats
+        eventCount++;
+        countEl.textContent = eventCount;
+        lastSymbolEl.textContent = event.entity;
+
+        // Update price badge in selector
+        const priceEl = document.querySelector(`[data-price="${event.entity}"]`);
+        if (priceEl && event.price != null) {
+          const p = event.price;
+          const formatted = p >= 10000 ? `$${p.toFixed(0)}` : `$${p.toFixed(2)}`;
+          priceEl.textContent = formatted;
         }
       });
 
@@ -117,7 +190,7 @@
         }
       });
 
-      debugLog("Live Kafka wiring complete.");
+      console.log("[Demo] Live Kafka wiring ready. Enabled:", [...enabled]);
     });
   </script>
 </body>

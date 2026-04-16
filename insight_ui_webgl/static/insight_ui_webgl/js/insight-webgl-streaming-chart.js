@@ -247,9 +247,16 @@ export class WebGLStreamingChart {
         this._mesh.instanceMatrix.needsUpdate = true;
         if (this._mesh.instanceColor) this._mesh.instanceColor.needsUpdate = true;
 
-        let total = 0;
-        for (const info of this._entities.values()) total += info.count;
-        this._mesh.count = total;
+        // Count must cover the highest used slot index: slots are indexed
+        // `lane * capacity + i`, so the max slot is `maxLane * capacity + capacity - 1`.
+        // Summing `info.count` across entities is WRONG — it clips later lanes
+        // because InstancedMesh only renders indices [0..count-1]. Unused slots
+        // in covered lanes are parked at y=-10000, so rendering them is cheap.
+        let maxLane = -1;
+        for (const info of this._entities.values()) {
+            if (info.lane > maxLane) maxLane = info.lane;
+        }
+        this._mesh.count = maxLane >= 0 ? (maxLane + 1) * this._capacity : 0;
     }
 
     // ---- Events ----
